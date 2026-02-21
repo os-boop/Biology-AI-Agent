@@ -1,0 +1,25 @@
+​<!-- end list -->name: Biology Agent Daily Run
+on:
+  schedule:
+    - cron: '0 9 * * *' # سيعمل تلقائياً كل يوم الساعة 9 صباحاً
+  workflow_dispatch: # زر للتشغيل اليدوي الآن
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Python dependencies
+        run: pip install -U google-generativeai
+      - name: Run Agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python main.py
+      - name: Save Result
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add TODAY_PLAN.md
+          git commit -m "New Video Plan Generated"
+          git push
+          
