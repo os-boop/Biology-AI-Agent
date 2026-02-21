@@ -3,20 +3,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  run-script:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: pip install -U google-generativeai
-      - name: Run Agent
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install -U google-generativeai
+      - name: Execute Agent
         env:
-          GEMINI_API_KEY: ${{ AIzaSyBZUgx5cBvJLIruuWtlUS0AWaR3lUMSpyQ }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python main.py
       - name: Save Result
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m "New Video Plan" || echo "No changes"
+          git commit -m "Generated Video Plan" || echo "No changes"
           git push
