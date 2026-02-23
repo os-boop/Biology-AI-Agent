@@ -1,4 +1,4 @@
-name: Biology Agent
+name: Biology Agent v1
 on:
   workflow_dispatch:
 jobs:
