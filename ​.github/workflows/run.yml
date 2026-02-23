@@ -1,20 +1,21 @@
 name: Biology Agent
 on:
   workflow_dispatch:
-
 jobs:
-  build:
+  run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - run: pip install -U google-generativeai
       - run: python main.py
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      - run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "Update" || echo "No changes"
+      - name: Save Results
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add VIDEO_PLAN.md
+          git commit -m "New Video Plan" || exit 0
           git push
-          
