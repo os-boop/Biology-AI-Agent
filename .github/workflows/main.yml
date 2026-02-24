@@ -8,7 +8,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - run: pip install -U google-generativeai
+      - run: pip install --upgrade google-generativeai
       - run: python main.py
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
