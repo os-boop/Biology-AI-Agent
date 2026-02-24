@@ -1,49 +1,26 @@
 import os
-import requests
-import json
+import google.generativeai as genai
 
 def start_agent():
     api_key = os.getenv("GEMINI_API_KEY")
-    
-    # الرابط السحري: استخدام v1beta مع الموديل بدون أرقام فرعية معقدة
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key={api_key}"
-    
-    payload = {
-        "contents": [{
-            "parts": [{"text": "اكتب خطة فيديو تعليمي مفصلة عن القلب البشري بالعربي"}]
-        }]
-    }
-    
-    headers = {'Content-Type': 'application/json'}
+    if not api_key:
+        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+            f.write("API KEY غير موجودة في الإعدادات ❌")
+        return
 
     try:
-        response = requests.post(url, headers=headers, data=json.dumps(payload))
-        result = response.json()
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content("اكتب خطة فيديو قصيرة عن التنفس الخلوي")
         
-        # إذا نجح الاتصال
-        if 'candidates' in result:
-            text_content = result['candidates'][0]['content']['parts'][0]['text']
-            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-                f.write(text_content)
-            print("نجاح باهر! الخطة جاهزة. ✅")
-        else:
-            # محاولة أخيرة بموديل gemini-pro إذا فشل flash
-            url_pro = url.replace("gemini-1.5-flash", "gemini-pro")
-            response = requests.post(url_pro, headers=headers, data=json.dumps(payload))
-            result = response.json()
-            
-            if 'candidates' in result:
-                text_content = result['candidates'][0]['content']['parts'][0]['text']
-                with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-                    f.write(text_content)
-            else:
-                # كتابة الخطأ بوضوح لنعرف ما يطلبه جوجل بالضبط
-                with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-                    f.write(f"رد جوجل الأخير: {json.dumps(result, ensure_ascii=False)}")
-                
+        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+            f.write(response.text)
+        print("نجاح ✅")
+        
     except Exception as e:
         with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-            f.write(f"خطأ في الطلب المباشر: {str(e)}")
+            f.write(f"حدث خطأ أثناء الاتصال: {str(e)}")
+        print(f"فشل: {e}")
 
 if __name__ == "__main__":
     start_agent()
