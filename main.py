@@ -7,7 +7,7 @@ def start_agent():
     genai.configure(api_key=api_key)
     
     # اختيار النموذج والطلب
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
     try:
         response = model.generate_content("اكتب نص فيديو قصير عن القلب البشري مع روابط فيديو 4k")
         
