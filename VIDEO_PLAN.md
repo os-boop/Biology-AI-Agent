@@ -1,1 +1,1 @@
-حدث خطأ في الذكاء الاصطناعي: 404 models/gemini-1.5-flash-latest is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+لم نتمكن من الاتصال بالموديلات، يرجى التحقق من نسخة المكتبة.
