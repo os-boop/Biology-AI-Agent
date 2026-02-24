@@ -3,25 +3,38 @@ import google.generativeai as genai
 
 def start_agent():
     api_key = os.getenv("GEMINI_API_KEY")
-    # إعداد المكتبة لاستخدام النسخة المستقرة
     genai.configure(api_key=api_key)
 
-    try:
-        # جرب الموديل المستقر "gemini-1.5-flash" بدون بادئة الإصدار
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content("اكتب خطة فيديو تعليمي عن القلب البشري بالعربي")
-        
-        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-            f.write(response.text)
-        print("Success: Plan Generated! ✅")
-        
-    except Exception as e:
-        # إذا فشل الفلاش، جرب البرو كخطة احتياطية فورية
+    # قائمة بكل المسميات المحتملة للموديلات لتجنب خطأ v1beta
+    models_to_try = [
+        'gemini-1.5-flash', 
+        'gemini-1.0-pro', 
+        'models/gemini-1.5-flash', 
+        'models/gemini-pro'
+    ]
+    
+    success = False
+    last_error = ""
+
+    for model_name in models_to_try:
         try:
-            model = genai.GenerativeModel('gemini-pro')
+            print(f"Trying model: {model_name}...")
+            model = genai.GenerativeModel(model_name)
             response = model.generate_content("اكتب خطة فيديو تعليمي عن القلب البشري بالعربي")
+            
             with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
                 f.write(response.text)
-        except Exception as e2:
-            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-                f.write(f"فشل الاتصال النهائي. السبب: {str(e2)}")
+            
+            print(f"Successfully connected with: {model_name} ✅")
+            success = True
+            break
+        except Exception as e:
+            last_error = str(e)
+            continue
+
+    if not success:
+        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+            f.write(f"فشل الاتصال بكل الموديلات. آخر خطأ: {last_error}")
+
+if __name__ == "__main__":
+    start_agent()
