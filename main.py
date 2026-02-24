@@ -22,9 +22,9 @@ def start_agent():
         except Exception as e:
             print(f"Failed with {model_name}: {e}")
 
-            if not content_generated:
-        error_msg = f"فشل الاتصال. تأكد من صلاحية المفتاح. آخر محاولة فشلت بسبب: {str(e)}"
-        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+        if not content_generated:
+            error_msg = f"فشل الاتصال. تأكد من صلاحية المفتاح. آخر محاولة فشلت بسبب: {str(e)}"
+            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
             f.write(error_msg)
             
 
