@@ -8,14 +8,20 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - run: pip install --upgrade google-generativeai
-      - run: python main.py
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install --upgrade google-generativeai
+      - name: Run script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      - name: Save Result
+        run: python main.py
+      - name: Save and Push Result
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
-          git add VIDEO_PLAN.md || echo "File not found"
-          git commit -m "Success: Biology Plan Created" || exit 0
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add VIDEO_PLAN.md
+          git commit -m "Success: Video Plan Updated" || echo "No changes to commit"
           git push
