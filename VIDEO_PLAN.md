@@ -1,1 +1,1 @@
-فشل الاتصال بجوجل. السبب التقني: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+فشل الاتصال بكل الموديلات. آخر خطأ: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
