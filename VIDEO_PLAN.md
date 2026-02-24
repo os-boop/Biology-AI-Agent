@@ -1,1 +1,1 @@
-خطأ الإصدار النهائي: __init__() got an unexpected keyword argument 'api_version'
+خطأ الاتصال الأخير: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
