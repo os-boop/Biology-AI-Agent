@@ -2,26 +2,29 @@ import os
 import google.generativeai as genai
 
 def start_agent():
-    # جلب المفتاح
     api_key = os.getenv("GEMINI_API_KEY")
     genai.configure(api_key=api_key)
     
-    # اختيار النموذج والطلب
-    model = genai.GenerativeModel('gemini-1.5-flash-latest')
-    try:
-        response = model.generate_content("اكتب نص فيديو قصير عن القلب البشري مع روابط فيديو 4k")
-        
-        # التأكد من إنشاء الملف في المسار الصحيح
-        content = response.text if response.text else "فشل في جلب المحتوى"
+    # قائمة بأسماء الموديلات الممكنة لتجربتها آلياً
+    models_to_try = ['gemini-1.5-flash', 'gemini-pro']
+    
+    content_generated = False
+    for model_name in models_to_try:
+        try:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content("اكتب خطة فيديو تعليمي عن القلب البشري بالعربي مع روابط فيديوهات")
+            
+            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+                f.write(response.text)
+            print(f"Success with model: {model_name} ✅")
+            content_generated = True
+            break # توقف إذا نجح أحد الموديلات
+        except Exception as e:
+            print(f"Failed with {model_name}: {e}")
+
+    if not content_generated:
         with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-            f.write(content)
-        print("تم إنشاء الملف بنجاح ✅")
-    except Exception as e:
-        # إذا فشل الذكاء الاصطناعي، سننشئ ملف طوارئ للتأكد من نجاح الـ Action
-        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-            f.write(f"حدث خطأ في الذكاء الاصطناعي: {str(e)}")
-        print("تم إنشاء ملف طوارئ")
+            f.write("لم نتمكن من الاتصال بالموديلات، يرجى التحقق من نسخة المكتبة.")
 
 if __name__ == "__main__":
     start_agent()
-    
