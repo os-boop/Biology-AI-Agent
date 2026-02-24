@@ -6,7 +6,7 @@ def start_agent():
     api_key = os.getenv("GEMINI_API_KEY")
     
     # الرابط السحري: استخدام v1beta مع الموديل بدون أرقام فرعية معقدة
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key={api_key}"
     
     payload = {
         "contents": [{
