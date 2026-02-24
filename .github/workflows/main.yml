@@ -1,4 +1,4 @@
-name: Biology Agent v1
+name: Biology Agent Final
 on:
   workflow_dispatch:
 jobs:
@@ -8,21 +8,24 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Install dependencies
+      - name: Call Gemini API Directly
         run: |
-          pip install google-generativeai
-      - name: Run script
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python main.py
+          curl https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${{ secrets.GEMINI_API_KEY }} \
+          -H 'Content-Type: application/json' \
+          -X POST \
+          -d '{
+            "contents": [{
+              "parts":[{"text": "اكتب خطة فيديو تعليمي عن التنفس الخلوي بالعربي"}]
+            }]
+          }' > response.json
+          
+          # استخراج النص فقط من الرد وحفظه في الملف
+          cat response.json | python3 -c "import sys, json; print(json.load(sys.stdin)['candidates'][0]['content']['parts'][0]['text'])" > VIDEO_PLAN.md
+
       - name: Save Result
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add VIDEO_PLAN.md
-          git commit -m "Success: Video Plan Updated" || echo "No changes"
+          git commit -m "Success: Final Plan Generated" || echo "No changes"
           git push
