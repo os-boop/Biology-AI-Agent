@@ -1,33 +1,41 @@
 import os
-import google.generativeai as genai
+import requests
+import json
 
 def start_agent():
-    # 1. جلب المفتاح
+    # 1. جلب المفتاح من الخزنة
     api_key = os.getenv("GEMINI_API_KEY")
     
-    # 2. إعداد بسيط جداً
-    genai.configure(api_key=api_key)
+    # 2. الرابط المباشر لجوجل (الإصدار المستقر v1)
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
+    
+    # 3. محتوى الطلب
+    payload = {
+        "contents": [{
+            "parts": [{"text": "اكتب خطة فيديو تعليمي مفصلة عن القلب البشري بالعربي مع روابط فيديوهات"}]
+        }]
+    }
+    
+    headers = {'Content-Type': 'application/json'}
 
     try:
-        # 3. محاولة مباشرة بدون أي تعقيدات إضافية
-        # استخدمنا اسم الموديل بدون أي مسارات (models/) لتجنب خطأ 404
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content("اكتب خطة فيديو تعليمي عن القلب البشري بالعربي")
+        # 4. إرسال الطلب يدوياً وتجاوز المكتبة المتعطلة
+        response = requests.post(url, headers=headers, data=json.dumps(payload))
+        result = response.json()
         
-        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-            f.write(response.text)
-        print("Success! ✅")
-
+        # 5. استخراج النص وحفظه
+        if 'candidates' in result:
+            text_content = result['candidates'][0]['content']['parts'][0]['text']
+            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+                f.write(text_content)
+            print("Success! Finally bypass completed. ✅")
+        else:
+            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+                f.write(f"خطأ من جوجل: {json.dumps(result, ensure_ascii=False)}")
+                
     except Exception as e:
-        # محاولة أخيرة بموديل gemini-pro إذا فشل الفلاش
-        try:
-            model = genai.GenerativeModel('gemini-pro')
-            response = model.generate_content("اكتب خطة فيديو تعليمي عن القلب البشري بالعربي")
-            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-                f.write(response.text)
-        except Exception as e2:
-            with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
-                f.write(f"خطأ الاتصال الأخير: {str(e2)}")
+        with open("VIDEO_PLAN.md", "w", encoding="utf-8") as f:
+            f.write(f"فشل الاتصال المباشر: {str(e)}")
 
 if __name__ == "__main__":
     start_agent()
